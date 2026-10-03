@@ -1,0 +1,27 @@
+# Local env and bootstrap
+.env
+.env.*
+!.env.example
+*.local
+sync.env
+.homelab/
+
+__pycache__/
+*.pyc
+build/
+dist/
+dist-nuitka/
+dist-nuitka-apprise/
+nuitka-crash-report.xml
+*.spec
+.venv/
+.claude/
+*.har
+*.exe
+config.json
+cookies.json
+credentials.json
+server.json
+*.cookie
+*.notify
+cookies.json*.legacy.bak

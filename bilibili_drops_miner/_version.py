@@ -1,0 +1,5 @@
+APP_VERSION = "v2.1.0-macos.1"
+UPDATE_CHANNEL = "dev"
+REPOSITORY_URL = "https://github.com/BeamusWayne/bili-live-companion"
+LATEST_RELEASE_API = "https://api.github.com/repos/BeamusWayne/bili-live-companion/releases/latest"
+RELEASES_URL = "https://github.com/BeamusWayne/bili-live-companion/releases/latest"
