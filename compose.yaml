@@ -1,0 +1,31 @@
+services:
+  bilidrop:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,nosuid,noexec,size=64m
+    volumes:
+      - type: bind
+        source: ./server.json
+        target: /etc/bilidrop/server.json
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: volume
+        source: bilidrop-data
+        target: /data
+    command: ["--config", "/etc/bilidrop/server.json", "--data-dir", "/data", "run"]
+    stdin_open: true
+    tty: true
+    stop_grace_period: 30s
+
+volumes:
+  bilidrop-data:

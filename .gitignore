@@ -15,6 +15,7 @@ dist-nuitka-apprise/
 nuitka-crash-report.xml
 *.spec
 .venv/
+.venv-server/
 .claude/
 *.har
 *.exe
@@ -22,6 +23,7 @@ config.json
 cookies.json
 credentials.json
 server.json
+server-data/
 *.cookie
 *.notify
 cookies.json*.legacy.bak

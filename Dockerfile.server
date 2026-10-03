@@ -1,0 +1,19 @@
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+COPY requirements-server.txt /app/
+RUN pip install --no-cache-dir -r requirements-server.txt \
+    && groupadd --system --gid 10001 bilidrop \
+    && useradd --system --uid 10001 --gid bilidrop --home-dir /data bilidrop \
+    && mkdir -p /data /etc/bilidrop \
+    && chown bilidrop:bilidrop /data
+
+COPY bilibili_server.py /app/
+COPY bilibili_drops_miner /app/bilibili_drops_miner
+
+USER bilidrop:bilidrop
+ENTRYPOINT ["python", "/app/bilibili_server.py"]
+CMD ["--config", "/etc/bilidrop/server.json", "--data-dir", "/data", "run"]

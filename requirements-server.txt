@@ -1,0 +1,5 @@
+httpx==0.28.1
+colorama==0.4.6
+json5==0.15.0
+qrcode==8.2
+tzdata==2025.3

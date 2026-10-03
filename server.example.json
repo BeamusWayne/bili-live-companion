@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "accounts": [
+    {
+      "name": "main",
+      "rooms": [23612045],
+      "threads": 2,
+      "auto_discover": true,
+      "task_ids": [],
+      "discovery_interval_seconds": 900,
+      "task_query_interval_seconds": 900,
+      "reconnect_delay_seconds": 8
+    }
+  ]
+}

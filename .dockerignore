@@ -1,0 +1,17 @@
+.git
+.venv
+build
+dist
+tests
+docs
+task
+assets
+img
+*.spec
+*.pyc
+__pycache__
+server.json
+*.cookie
+*.notify
+.env
+.env.*
