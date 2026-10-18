@@ -1,6 +1,8 @@
 <div align="center">
 
-# 🎁 Bili Live Companion
+<img src="assets/bilibili-tray.png" alt="Bili Live Companion 小电视" width="72" height="72">
+
+# Bili Live Companion
 
 ### 哔哩哔哩直播掉宝自动挂机领取小助手
 
@@ -14,7 +16,7 @@
 
 扫码登录 · 多账号守候 · 任务进度 · 达标领奖
 
-当前为 **v0.1.0-alpha.1 开发预览版**，尚未正式发布。
+**v0.1.0** · [下载 Windows x64 版](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.0) · [Windows 使用说明](docs/windows.md)
 
 [功能一览](#功能一览) · [快速开始](#快速开始) · [支持项目](#支持项目) · [English](README_EN.md)
 
@@ -56,7 +58,11 @@ Linux 服务无需桌面环境或入站端口，各端均不需要其他系统�
 
 ### Windows 桌面版
 
-新版桌面界面采用B 站粉白配色、侧栏导航、独立账号管理与可视化奖励进度。Windows 使用本机 DPAPI 加密凭据，支持托盘与单实例唤醒。
+前往 [Releases 下载 Windows x64 版](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.0)中的 **BiliCompanion-v0.1.0-Windows-x64.exe**，双击即可使用，无需安装 Python。详细步骤见 [Windows 使用说明](docs/windows.md)。
+
+新版桌面界面采用 B 站粉白配色、侧栏导航、独立账号管理与可视化奖励进度。Windows 使用本机 DPAPI 加密凭据，支持托盘与单实例唤醒。
+
+也可以从源码运行：
 
 ```powershell
 py -3 -m venv .venv
@@ -64,9 +70,9 @@ py -3 -m venv .venv
 .\.venv\Scripts\python.exe bilibili_gui.py
 ```
 
-独立 EXE 可直接运行，无需安装 Python。在 Windows 上执行 `.\build_windows.ps1` 可完成测试、构建和产物启动检查。详细步骤见 [Windows 使用说明](docs/windows.md)。
+在 Windows 上执行 `.\build_windows.ps1` 可完成测试、构建和产物启动检查。
 
-[Windows desktop 构建流程](https://github.com/BeamusWayne/bili-live-companion/actions/workflows/windows-desktop.yml)会在 PR 和主分支更新时运行。成功后可在运行记录的 **Artifacts → Bili-Companion-Windows-x64** 下载 EXE；目前没有正式 Release 安装包。
+[Windows desktop 构建流程](https://github.com/BeamusWayne/bili-live-companion/actions/workflows/windows-desktop.yml)会在 PR 和主分支更新时运行。测试、打包与启动检查通过后，主分支中新的正式版本会自动发布到 Releases；日常构建也保留在 **Artifacts → Bili-Companion-Windows-x64**。
 
 ### macOS 桌面版
 

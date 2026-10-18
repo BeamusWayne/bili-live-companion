@@ -1,6 +1,8 @@
 <div align="center">
 
-# 🎁 Bili Live Companion
+<img src="assets/bilibili-tray.png" alt="Bili Live Companion TV" width="72" height="72">
+
+# Bili Live Companion
 
 ### Bilibili Live Drops auto-watching and reward-claiming helper
 
@@ -14,7 +16,7 @@
 
 QR sign-in · Multiple accounts · Task progress · Reward claims
 
-Current version: **v0.1.0-alpha.1 development preview**. No stable release has been published.
+**v0.1.0** · [Download for Windows x64](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.0) · [Windows guide](docs/windows.md)
 
 [Features](#features) · [Quick Start](#quick-start) · [Support](#support-the-project) · [中文](README.md)
 
@@ -56,7 +58,11 @@ The UI uses Bilibili pink and the repository's TV icon, with separate account ma
 
 ### Windows desktop
 
-The desktop UI now uses a Bilibili pink and white palette with sidebar navigation, a separate account page, and visual reward progress. Windows credentials use DPAPI; tray operation and single-instance activation are supported.
+Download **BiliCompanion-v0.1.0-Windows-x64.exe** from [Releases](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.0) and double-click to run. Python is not required. See the [Windows guide](docs/windows.md) for details (in Chinese).
+
+The desktop UI uses a Bilibili pink and white palette with sidebar navigation, a separate account page, and visual reward progress. Windows credentials use DPAPI; tray operation and single-instance activation are supported.
+
+Alternatively, run from source:
 
 ```powershell
 py -3 -m venv .venv
@@ -64,9 +70,9 @@ py -3 -m venv .venv
 .\.venv\Scripts\python.exe bilibili_gui.py
 ```
 
-Run `.\build_windows.ps1` on Windows to test, build a standalone EXE, and validate the packaged app. A packaged EXE does not require Python. See the [Windows guide](docs/windows.md) for details (in Chinese).
+Run `.\build_windows.ps1` on Windows to test, build a standalone EXE, and validate the packaged app.
 
-The [Windows desktop workflow](https://github.com/BeamusWayne/bili-live-companion/actions/workflows/windows-desktop.yml) runs on PRs and main-branch updates. Download the EXE from **Artifacts → Bili-Companion-Windows-x64** in a successful run. No stable Release installer is published yet.
+The [Windows desktop workflow](https://github.com/BeamusWayne/bili-live-companion/actions/workflows/windows-desktop.yml) runs on PRs and main-branch updates. New release-channel versions on main are published to Releases after tests, packaging, and the executable smoke test pass. Routine builds remain available under **Artifacts → Bili-Companion-Windows-x64**.
 
 ### macOS desktop
 

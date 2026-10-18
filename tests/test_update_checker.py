@@ -5,10 +5,10 @@ from bilibili_drops_miner.gui_parts.update_checker import (
 )
 
 
-def test_unreleased_app_uses_initial_alpha_version() -> None:
-    assert APP_VERSION == "v0.1.0-alpha.1"
-    assert UPDATE_CHANNEL == "dev"
-    assert not should_check_update(APP_VERSION, UPDATE_CHANNEL)
+def test_first_public_release_checks_for_updates() -> None:
+    assert APP_VERSION == "v0.1.0"
+    assert UPDATE_CHANNEL == "release"
+    assert should_check_update(APP_VERSION, UPDATE_CHANNEL)
 
 
 def test_release_channel_checks_for_updates() -> None:

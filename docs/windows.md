@@ -1,12 +1,12 @@
 # Bili Companion Windows 桌面版
 
-新版采用B 站粉（`#FB7299`）、白色与浅灰色，使用 Qt 原生窗口。首页展示直播间、运行状态、连接数和奖励节点；账号凭据在独立账号页管理，设置与日志由侧栏打开。
+新版采用 B 站粉（`#FB7299`）、白色与浅灰色，使用 Qt 原生窗口。首页展示直播间、运行状态、连接数和奖励节点；账号凭据在独立账号页管理，设置与日志由侧栏打开。
 
-当前为 `v0.1.0-alpha.1` 开发预览版，尚未正式发布。应用使用仓库已有的 B 站小电视图标。
+当前版本为 `v0.1.0`，应用使用仓库已有的 B 站小电视图标。
 
 ## 直接运行
 
-在 Windows x64 上双击 `bilibili-drops-miner-gui.exe`。独立 EXE 已包含 Python、Qt、时区数据库与应用资源，不需要另外安装 Python。
+从 [Releases](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.0) 下载 **BiliCompanion-v0.1.0-Windows-x64.exe**，在 Windows x64 上双击运行。独立 EXE 已包含 Python、Qt、时区数据库与应用资源，不需要另外安装 Python。发布页同时提供使用说明和 `SHA256SUMS.txt` 校验文件。
 
 1. 点击右上角「扫码登录」，用 Bilibili App 扫描并确认。
 2. 在「账号管理」填写备注并「保存档案」，便于下次继续使用；临时账号关闭后删除。
@@ -58,7 +58,7 @@ py -3 -m venv .venv
 .\.venv\Scripts\python.exe build.py --target gui --clean
 ```
 
-Windows 版本必须在 Windows 上打包。`.github/workflows/windows-desktop.yml` 提供 Windows 构建与制品上传流程；在 GitHub Actions 中也可手动运行，产物不会自动发布为 Release。
+Windows 版本必须在 Windows 上打包。`.github/workflows/windows-desktop.yml` 提供测试、构建、启动检查与发布流程，也可手动运行。主分支采用 `release` 更新渠道且版本号尚未发布时，会创建对应标签及 Release；已有 Release 不会被覆盖。发布附件来自同一次通过检查的构建。
 
 ## 离线验证
 

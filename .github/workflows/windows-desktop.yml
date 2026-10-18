@@ -36,3 +36,75 @@ jobs:
             dist/windows-smoke-result.json
             docs/windows.md
             LICENSE
+
+  publish:
+    needs: build
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: windows-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Read the release version
+        id: version
+        run: |
+          python3 - <<'PY'
+          import os, re, runpy
+          values = runpy.run_path('bilibili_drops_miner/_version.py')
+          version = values['APP_VERSION']
+          enabled = values['UPDATE_CHANNEL'] == 'release'
+          if enabled and not re.fullmatch(r'v\d+\.\d+\.\d+', version):
+              raise SystemExit('A public release needs a vMAJOR.MINOR.PATCH version.')
+          if os.environ['GITHUB_REF_TYPE'] == 'tag' and os.environ['GITHUB_REF_NAME'] != version:
+              raise SystemExit('The Git tag and app version must match.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'version={version}\nenabled={str(enabled).lower()}\n')
+          PY
+      - name: Check whether this version is already published
+        if: steps.version.outputs.enabled == 'true'
+        id: release
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          status=$(curl --silent --show-error --output existing-release.json --write-out '%{http_code}' \
+            --header "Authorization: Bearer $GH_TOKEN" --header 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$VERSION")
+          case "$status" in
+            200)
+              if jq -e '.draft == false' existing-release.json > /dev/null; then
+                echo 'publish=false' >> "$GITHUB_OUTPUT"
+                echo "$VERSION is already published; its assets will be preserved."
+              else
+                echo '::error::A draft already exists for this version. Inspect it before retrying.'
+                exit 1
+              fi
+              ;;
+            404) echo 'publish=true' >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::Release lookup failed (HTTP $status)."; exit 1 ;;
+          esac
+      - uses: actions/download-artifact@v7
+        if: steps.release.outputs.publish == 'true'
+        with:
+          name: Bili-Companion-Windows-x64
+          path: artifact
+      - name: Prepare versioned assets and checksums
+        if: steps.release.outputs.publish == 'true'
+        run: python3 scripts/prepare_windows_release.py --artifact artifact --output release
+      - name: Upload assets and publish the release
+        if: steps.release.outputs.publish == 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          test -f "docs/releases/$VERSION.md"
+          gh release create "$VERSION" release/* --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --title "Bili Live Companion $VERSION" \
+            --notes-file "docs/releases/$VERSION.md" --draft --latest=false
+          gh release edit "$VERSION" --repo "$GITHUB_REPOSITORY" --draft=false --latest
