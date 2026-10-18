@@ -26,7 +26,7 @@ def prepare(artifact: Path, output: Path) -> list[Path]:
     output.mkdir(parents=True, exist_ok=False)
     sources = {
         f"BiliCompanion-{version}-Windows-x64.exe": binary,
-        "Windows使用说明.md": artifact / "docs/windows.md",
+        "Windows.md": artifact / "docs/windows.md",
         "LICENSE.txt": artifact / "LICENSE",
         "windows-smoke-result.json": smoke_path,
     }

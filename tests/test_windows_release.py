@@ -5,6 +5,7 @@ import pytest
 
 from bilibili_drops_miner._version import APP_VERSION
 from scripts.prepare_windows_release import prepare
+from scripts.reconcile_release_checksums import reconcile
 
 
 def make_artifact(tmp_path, **smoke_changes):
@@ -29,6 +30,7 @@ def test_release_assets_keep_the_validated_executable_and_match_checksums(tmp_pa
     assets = prepare(artifact, tmp_path / "release")
     executable = assets[0]
     assert executable.name == f"BiliCompanion-{APP_VERSION}-Windows-x64.exe"
+    assert (tmp_path / "release/Windows.md").is_file()
     assert executable.read_bytes() == (artifact / "dist/bilibili-drops-miner-gui.exe").read_bytes()
     checksums = (tmp_path / "release/SHA256SUMS.txt").read_text(encoding="utf-8")
     for asset in assets[:-1]:
@@ -41,3 +43,26 @@ def test_release_rejects_failed_mismatched_or_incomplete_smoke_test(tmp_path, ch
     with pytest.raises(ValueError):
         prepare(artifact, tmp_path / "release")
     assert not (tmp_path / "release").exists()
+
+
+def test_checksums_follow_github_asset_names_without_changing_the_digest(tmp_path):
+    metadata = tmp_path / "release.json"
+    digest = "a" * 64
+    metadata.write_text(json.dumps({"assets": [{"name": "Windows.md", "state": "uploaded", "digest": f"sha256:{digest}"}]}))
+    checksums = tmp_path / "SHA256SUMS.txt"
+    checksums.write_text(f"{digest}  Windows使用说明.md\n", encoding="utf-8")
+    assert reconcile(metadata, checksums)
+    corrected = checksums.with_suffix(".txt.corrected").read_text(encoding="utf-8")
+    assert corrected == f"{digest}  Windows.md\n"
+    checksums.write_text(corrected, encoding="utf-8")
+    assert not reconcile(metadata, checksums)
+
+
+def test_checksums_cannot_be_repaired_without_a_github_digest(tmp_path):
+    metadata = tmp_path / "release.json"
+    metadata.write_text(json.dumps({"assets": [{"name": "Windows.md", "state": "uploaded"}]}))
+    checksums = tmp_path / "SHA256SUMS.txt"
+    checksums.write_text("unchanged\n", encoding="utf-8")
+    with pytest.raises(ValueError):
+        reconcile(metadata, checksums)
+    assert not checksums.with_suffix(".txt.corrected").exists()

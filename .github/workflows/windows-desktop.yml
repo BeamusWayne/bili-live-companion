@@ -90,6 +90,17 @@ jobs:
             404) echo 'publish=true' >> "$GITHUB_OUTPUT" ;;
             *) echo "::error::Release lookup failed (HTTP $status)."; exit 1 ;;
           esac
+      - name: Validate the published asset names in the checksum file
+        if: steps.release.outputs.publish == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release download "$VERSION" --repo "$GITHUB_REPOSITORY" --pattern SHA256SUMS.txt --dir existing
+          python3 scripts/reconcile_release_checksums.py --metadata existing-release.json --checksums existing/SHA256SUMS.txt
+          if [ -f existing/SHA256SUMS.txt.corrected ]; then
+            cp existing/SHA256SUMS.txt.corrected existing/SHA256SUMS.txt
+            gh release upload "$VERSION" existing/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" --clobber
+          fi
       - uses: actions/download-artifact@v7
         if: steps.release.outputs.publish == 'true'
         with:
