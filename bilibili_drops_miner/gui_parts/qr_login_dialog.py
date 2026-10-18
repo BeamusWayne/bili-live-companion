@@ -77,27 +77,22 @@ class QrLoginDialog(QDialog):
         layout.setSpacing(12)
 
         title = QLabel("使用 Bilibili App 扫码登录")
-        title.setStyleSheet("font-size:17px;font-weight:700;color:#f3f4f6;")
+        title.setStyleSheet("font-size:17px;font-weight:700;color:#18191c;")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
-
-        subtitle = QLabel("二维码只用于本次登录，成功后会自动关闭")
-        subtitle.setStyleSheet("color:#aeb6c5;")
-        subtitle.setAlignment(Qt.AlignCenter)
-        layout.addWidget(subtitle)
 
         self.qr_label = QLabel("正在获取二维码…")
         self.qr_label.setAlignment(Qt.AlignCenter)
         self.qr_label.setMinimumSize(300, 300)
         self.qr_label.setStyleSheet(
-            "background:#ffffff;color:#4b5563;border-radius:12px;padding:10px;"
+            "background:#ffffff;color:#61666d;border-radius:12px;padding:10px;"
         )
         layout.addWidget(self.qr_label, alignment=Qt.AlignCenter)
 
         self.status_label = QLabel("正在连接 Bilibili 登录服务")
         self.status_label.setAlignment(Qt.AlignCenter)
         self.status_label.setWordWrap(True)
-        self.status_label.setStyleSheet("color:#bfdbfe;font-weight:600;")
+        self.status_label.setStyleSheet("color:#087ea4;font-weight:600;")
         layout.addWidget(self.status_label)
 
         actions = QHBoxLayout()

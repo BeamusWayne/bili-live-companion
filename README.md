@@ -6,12 +6,15 @@
 
 **你负责扫码，它负责守候。**
 
+![Windows Desktop](https://img.shields.io/badge/Windows-Desktop-FB7299)
 ![macOS Desktop](https://img.shields.io/badge/macOS-Desktop-111111?logo=apple&logoColor=white)
 ![Linux Headless](https://img.shields.io/badge/Linux-Headless-FCC624?logo=linux&logoColor=black)
 ![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2ea44f)](LICENSE)
 
 扫码登录 · 多账号守候 · 任务进度 · 达标领奖
+
+当前为 **v0.1.0-alpha.1 开发预览版**，尚未正式发布。
 
 [功能一览](#功能一览) · [快速开始](#快速开始) · [支持项目](#支持项目) · [English](README_EN.md)
 
@@ -23,7 +26,7 @@
 
 | 能做什么 | 具体表现 |
 | --- | --- |
-| 📱 **扫码登录** | macOS 在应用内扫码；Linux 在 SSH 终端显示字符二维码和扫码地址 |
+| 📱 **扫码登录** | Windows / macOS 在应用内扫码；Linux 在 SSH 终端显示字符二维码和扫码地址 |
 | 👥 **多账号运行** | 每个账号独立保存凭据、直播间和任务状态 |
 | 📺 **观看心跳** | 按配置连接直播间，在断线后重试 |
 | 🎯 **任务追踪** | 识别当前任务、查询奖励节点进度，并在达标后尝试自动领取 |
@@ -31,19 +34,39 @@
 
 任务与奖励结果以 Bilibili 实际接口为准。页面结构变化可能影响自动识别；此时仍可观看，并可在 Linux 配置中手动填写任务 ID。
 
-## 两种运行方式
+## 三种运行方式
 
-| | macOS 桌面版 | Linux 云服务器版 |
-| --- | --- | --- |
-| 界面 | Qt 图形界面，可查看任务和日志 | 无图形界面，通过 SSH 和容器日志管理 |
-| 登录 | 应用内扫码 | 终端扫码，每个账号分别登录 |
-| 凭据 | 本机加密，密钥保存在 macOS 钥匙串 | Docker 数据卷中的 `0600` 文件，不做加密 |
-| 任务完成后 | 可确认全部领取时暂停当前观看，继续低频检测 | 继续观看，直到停止服务 |
-| 部署 | Python 源码运行，或本机打包 `.app` | Docker Compose，或 Python + systemd |
+| | Windows 桌面版 | macOS 桌面版 | Linux 云服务器版 |
+| --- | --- | --- | --- |
+| 界面 | B 站粉白配色 Qt 桌面界面 | 同一套 Qt 桌面界面 | SSH 与容器日志 |
+| 登录 | 应用内扫码 | 应用内扫码 | 终端扫码 |
+| 凭据 | 本机 DPAPI 加密 | 系统钥匙串保护 | Docker 数据卷中 `0600` 文件 |
+| 完成后 | 暂停观看，继续后台任务检测 | 暂停观看，继续后台任务检测 | 继续观看至停止服务 |
+| 部署 | 独立 EXE 或 Python 源码 | `.app` 或 Python 源码 | Docker Compose / systemd |
 
-Linux 服务无需桌面环境或入站端口。macOS 和 Linux 都不依赖 Windows 环境。
+Linux 服务无需桌面环境或入站端口，各端均不需要其他系统的虚拟机。
+
+## 桌面界面
+
+![Windows 桌面工作台（演示数据）](docs/images/windows-workspace.png)
+
+界面采用 B 站粉白配色与小电视图标，账号、直播间、任务进度集中展示；凭据在独立账号页管理。截图中的活动和进度仅用于演示。
 
 ## 快速开始
+
+### Windows 桌面版
+
+新版桌面界面采用B 站粉白配色、侧栏导航、独立账号管理与可视化奖励进度。Windows 使用本机 DPAPI 加密凭据，支持托盘与单实例唤醒。
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe bilibili_gui.py
+```
+
+独立 EXE 可直接运行，无需安装 Python。在 Windows 上执行 `.\build_windows.ps1` 可完成测试、构建和产物启动检查。详细步骤见 [Windows 使用说明](docs/windows.md)。
+
+[Windows desktop 构建流程](https://github.com/BeamusWayne/bili-live-companion/actions/workflows/windows-desktop.yml)会在 PR 和主分支更新时运行。成功后可在运行记录的 **Artifacts → Bili-Companion-Windows-x64** 下载 EXE；目前没有正式 Release 安装包。
 
 ### macOS 桌面版
 
@@ -80,7 +103,7 @@ docker compose logs -f --tail=100 bilidrop
 ## 使用须知
 
 - 请遵守平台规则，保持适度并发；任务、计时和奖励始终以平台实际结果为准。
-- macOS 凭据受系统钥匙串保护；Linux 数据卷中的 Cookie 文件未加密，服务器 root 或 Docker 管理员可以读取。
+- Windows 凭据使用 DPAPI 加密，macOS 凭据受系统钥匙串保护；Linux 数据卷中的 Cookie 文件未加密，服务器 root 或 Docker 管理员可以读取。
 - 真实扫码、直播计时和领奖依赖账号及当前活动，需要部署后自行核对日志或界面。
 
 ## 支持项目

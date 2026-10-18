@@ -23,13 +23,13 @@ def show_update_available_dialog(
     dialog.setModal(True)
     dialog.setMinimumWidth(430)
     dialog.setStyleSheet(
-        "QDialog{background:#1f232b;color:#e6e7eb;}"
-        "QLabel{color:#e6e7eb;}"
-        "QPushButton{background:#2f343e;color:#e6e7eb;border:1px solid #3a3f4b;"
+        "QDialog{background:#f6f7f8;color:#18191c;}"
+        "QLabel{color:#18191c;}"
+        "QPushButton{background:#ffffff;color:#18191c;border:1px solid #e3e5e7;"
         "border-radius:6px;padding:8px 18px;min-width:92px;}"
-        "QPushButton:hover{background:#3a4150;border-color:#4f8cff;}"
-        "QPushButton#primary{background:#4f8cff;color:#ffffff;border-color:#4f8cff;}"
-        "QPushButton#primary:hover{background:#3b73e6;}"
+        "QPushButton:hover{background:#fff0f5;border-color:#fb7299;}"
+        "QPushButton#primary{background:#fb7299;color:#4c2031;border-color:#fb7299;}"
+        "QPushButton#primary:hover{background:#ff8fb0;}"
     )
 
     layout = QVBoxLayout(dialog)
@@ -49,7 +49,7 @@ def show_update_available_dialog(
         "可前往发布页下载最新版本。"
     )
     body.setWordWrap(True)
-    body.setStyleSheet("color:#c9d1d9;line-height:1.45;")
+    body.setStyleSheet("color:#61666d;line-height:1.45;")
     layout.addWidget(body)
 
     button_row = QHBoxLayout()

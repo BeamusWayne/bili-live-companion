@@ -109,7 +109,7 @@ def test_initial_gui_is_guided_and_secrets_are_masked(window, app) -> None:
     assert window.boost_concurrency_btn.text() == "加速执行（本次 100 线程）"
     assert not window.apply_all_switch.isChecked()
     assert window.apply_all_switch.accessibleName() == "应用到所有账号"
-    assert "后台任务检测" in window.auto_mining_description.text()
+    assert "后台任务检测" in window.start_btn.toolTip()
     assert not any(
         "后台自动" in button.text()
         for button in window.findChildren(QPushButton)
@@ -135,16 +135,23 @@ def test_initial_gui_is_guided_and_secrets_are_masked(window, app) -> None:
         window.boost_concurrency_btn.width()
         >= window.boost_concurrency_btn.sizeHint().width()
     )
+    window.workspace_nav[1].click()
+    app.processEvents()
+    assert window.workspace_pages.currentIndex() == 1
+    assert window.cookie_edit.isVisible()
     row_y = {
         widget.mapTo(window, QPoint(0, widget.height() // 2)).y()
         for widget in (
-            window.cookie_profile_combo,
             window.cookie_remark_edit,
             window.save_cookie_profile_btn,
             window.delete_cookie_profile_btn,
         )
     }
     assert max(row_y) - min(row_y) <= 1
+    window.workspace_nav[0].click()
+    app.processEvents()
+    assert window.workspace_pages.currentIndex() == 0
+    assert not window.cookie_edit.isVisible()
     window.hide()
 
 
@@ -498,10 +505,10 @@ def test_runtime_health_explains_automatic_concurrency_stage(window) -> None:
         )
     )
 
-    assert "会话 当前 20 / 目标 16" in window.runtime_detail_label.text()
-    assert "手动运行" in window.runtime_detail_label.text()
+    assert "会话 当前 20 / 目标 16" in window.runtime_detail_label.toolTip()
+    assert "手动运行" in window.runtime_detail_label.toolTip()
     assert "自动追赶" in window.runtime_detail_label.text()
-    assert "2.40 倍" in window.runtime_detail_label.text()
+    assert "2.40 倍" in window.runtime_detail_label.toolTip()
 
 
 @pytest.mark.parametrize(
@@ -559,6 +566,45 @@ def test_empty_task_snapshot_has_actionable_message(window) -> None:
     assert window.task_table.rowCount() == 1
     assert "识别当前任务" in window.task_table.item(0, 0).text()
     assert not window.claim_rewards_btn.isEnabled()
+
+
+def test_workspace_statistics_follow_the_rendered_account(window) -> None:
+    window._render_runtime_health(RuntimeHealth(active_sessions=2, target_sessions=16))
+    assert window.connection_stat.text() == "2 / 16"
+    window._render_task_snapshot(TaskSnapshot(progresses=(
+        TaskProgress("claimed", "已领取任务", 3, 30, 30),
+        TaskProgress("working", "进行中任务", 1, 45, 90),
+    )))
+    assert window.reward_stat.text() == "2"
+    assert window.claimed_stat.text() == "1"
+    assert window.task_table.item(0, 1).data(Qt.UserRole) == 100
+    assert window.task_table.item(1, 1).data(Qt.UserRole) == 50
+    window._render_task_snapshot(TaskSnapshot(error="offline"))
+    assert window.reward_stat.text() == "—"
+    assert window.claimed_stat.text() == "—"
+
+
+def test_scope_switch_supports_keyboard_and_entire_hit_area(window) -> None:
+    from PySide6.QtTest import QTest
+    switch = window.apply_all_switch
+    assert switch.focusPolicy() == Qt.StrongFocus
+    QTest.mouseClick(switch, Qt.LeftButton, pos=QPoint(switch.width() - 4, 13))
+    assert switch.isChecked()
+    QTest.keyClick(switch, Qt.Key_Space)
+    assert not switch.isChecked()
+
+
+def test_workspace_remains_scrollable_at_minimum_window_size(window, app) -> None:
+    from PySide6.QtWidgets import QScrollArea
+    window.resize(1060, 720)
+    window.show()
+    app.processEvents()
+    page = window.workspace_pages.currentWidget()
+    assert isinstance(page, QScrollArea)
+    assert page.widget().width() <= page.viewport().width()
+    assert page.verticalScrollBar().maximum() > 0
+    assert window.start_btn.width() >= window.start_btn.sizeHint().width()
+    window.hide()
 
 
 def test_numeric_settings_are_plain_validated_text_fields(window) -> None:
