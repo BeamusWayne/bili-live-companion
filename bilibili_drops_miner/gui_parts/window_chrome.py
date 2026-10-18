@@ -9,8 +9,8 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QWidget
 
 
-APP_BACKGROUND_COLORREF = 0x00231D1A  # #1a1d23 in Win32 COLORREF order
-APP_TEXT_COLORREF = 0x00EBE7E6  # #e6e7eb in Win32 COLORREF order
+APP_BACKGROUND_COLORREF = 0x00F8F7F6  # #f6f7f8 in Win32 COLORREF order
+APP_TEXT_COLORREF = 0x001C1918  # #18191c in Win32 COLORREF order
 
 
 def bundled_resource_path(relative_path: str) -> Path:
@@ -39,12 +39,16 @@ def tray_icon(fallback: QIcon | None = None) -> QIcon:
 
 
 def install_window_chrome(app: QApplication) -> None:
-    icon_path = bundled_resource_path("assets/bilibili.png")
+    icon_path = bundled_resource_path("assets/bilibili-tray.png")
     if icon_path.is_file():
         app.setWindowIcon(QIcon(str(icon_path)))
 
     if sys.platform != "win32":
         return
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("BeamusWayne.BiliCompanion.Desktop")
+    except (AttributeError, OSError):
+        pass
     event_filter = _WindowsChromeEventFilter(app)
     app.installEventFilter(event_filter)
     # Keep the Python wrapper alive for the lifetime of QApplication.
@@ -58,11 +62,11 @@ class _WindowsChromeEventFilter(QObject):
             and isinstance(watched, QWidget)
             and watched.isWindow()
         ):
-            apply_windows_dark_caption(watched)
+            apply_windows_light_caption(watched)
         return super().eventFilter(watched, event)
 
 
-def apply_windows_dark_caption(window: QWidget) -> bool:
+def apply_windows_light_caption(window: QWidget) -> bool:
     if sys.platform != "win32":
         return False
     try:
@@ -77,7 +81,7 @@ def apply_windows_dark_caption(window: QWidget) -> bool:
         ]
         setter.restype = ctypes.c_long
 
-        dark_mode = ctypes.c_int(1)
+        dark_mode = ctypes.c_int(0)
         dark_result = setter(
             hwnd,
             20,  # DWMWA_USE_IMMERSIVE_DARK_MODE
@@ -116,3 +120,7 @@ def apply_windows_dark_caption(window: QWidget) -> bool:
         return True
     except (AttributeError, OSError, TypeError, ValueError):
         return False
+
+
+# Compatibility for integrations importing the previous helper name.
+apply_windows_dark_caption = apply_windows_light_caption

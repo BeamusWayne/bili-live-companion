@@ -1,58 +1,26 @@
 from __future__ import annotations
 
-
-DISABLED_BUTTON_STYLE = (
-    "QPushButton:disabled{background:#343a46;color:#7d8796;"
-    "border:1px solid #343a46;}"
+DISABLED_BUTTON_STYLE = "QPushButton:disabled{background:#f1f2f3;color:#9499a0;border:1px solid #e3e5e7;}"
+PRIMARY = (
+    "QPushButton{background:#fb7299;color:#4c2031;border:1px solid #fb7299;"
+    "border-radius:7px;padding:8px 18px;min-height:18px;font-weight:600;}"
+    "QPushButton:hover{background:#ff8fb0;border-color:#e45d88;}"
+    "QPushButton:pressed{background:#f25d8e;}"
+    "QPushButton:focus{border:1px solid #a92d56;}"
 )
-
-
-BUTTON_STYLES: dict[str, str] = {
-    "green": (
-        "QPushButton{background:#15803d;color:#ffffff;border:1px solid #15803d;border-radius:6px;"
-        "padding:8px 18px;min-height:20px;font-weight:600;}"
-        "QPushButton:hover{background:#16a34a;}"
-        "QPushButton:pressed{background:#166534;}"
-        "QPushButton:focus{background:#166534;}"
-    ),
-    "red": (
-        "QPushButton{background:#b91c1c;color:#ffffff;border:1px solid #b91c1c;border-radius:6px;"
-        "padding:8px 18px;min-height:20px;font-weight:600;}"
-        "QPushButton:hover{background:#dc2626;}"
-        "QPushButton:pressed{background:#991b1b;}"
-        "QPushButton:focus{background:#991b1b;}"
-    ),
-    "blue": (
-        "QPushButton{background:#2563eb;color:#ffffff;border:1px solid #2563eb;border-radius:6px;"
-        "padding:8px 18px;min-height:20px;font-weight:600;}"
-        "QPushButton:hover{background:#3b73e6;}"
-        "QPushButton:pressed{background:#1d4ed8;}"
-        "QPushButton:focus{background:#1d4ed8;}"
-    ),
-    "purple": (
-        "QPushButton{background:#7c3aed;color:#ffffff;border:1px solid #7c3aed;border-radius:6px;"
-        "padding:8px 18px;min-height:20px;font-weight:600;}"
-        "QPushButton:hover{background:#8b6ff0;}"
-        "QPushButton:pressed{background:#6d28d9;}"
-        "QPushButton:focus{background:#6d28d9;}"
-    ),
-    "gray": (
-        "QPushButton{background:#3a3f4b;color:#e6e7eb;border:0;border-radius:6px;"
-        "padding:8px 18px;min-height:20px;font-weight:600;}"
-        "QPushButton:hover{background:#454b58;}"
-        "QPushButton:pressed{background:#2f343e;}"
-        "QPushButton:focus{background:#2f343e;}"
-    ),
-    "": (
-        "QPushButton{background:#2f343e;color:#e6e7eb;border:1px solid #3a3f4b;"
-        "border-radius:6px;padding:8px 18px;min-height:20px;font-weight:500;}"
-        "QPushButton:hover{background:#363b47;border-color:#4a5060;}"
-        "QPushButton:pressed{background:#272b34;}"
-        "QPushButton:focus{background:#272b34;border-color:#4a5060;}"
-    ),
-}
-
-
-CARD_STYLE = (
-    "QFrame#card{background:#242832;border:1px solid #2f3440;border-radius:10px;}"
+SECONDARY = (
+    "QPushButton{background:#ffffff;color:#61666d;border:1px solid #e3e5e7;"
+    "border-radius:7px;padding:8px 14px;min-height:18px;font-weight:500;}"
+    "QPushButton:hover{background:#f8f9fa;border-color:#c9ccd0;}"
+    "QPushButton:pressed{background:#edeef0;}"
+    "QPushButton:focus{border-color:#a92d56;}"
 )
+DANGER = (
+    "QPushButton{background:#fff0f3;color:#b92d4a;border:1px solid #f1bcc8;"
+    "border-radius:7px;padding:8px 18px;min-height:18px;font-weight:600;}"
+    "QPushButton:hover{background:#ffe3ea;}"
+    "QPushButton:focus{border-color:#b92d4a;}"
+)
+# Aliases preserve the existing run controller's start/stop transitions.
+BUTTON_STYLES = {"green": PRIMARY, "blue": PRIMARY, "purple": PRIMARY, "red": DANGER, "gray": SECONDARY, "": SECONDARY}
+CARD_STYLE = "QFrame#card{background:#ffffff;border:1px solid #e3e5e7;border-radius:12px;}"

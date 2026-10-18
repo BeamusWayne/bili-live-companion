@@ -15,7 +15,7 @@ def test_application_icon_is_loaded_from_bundled_assets() -> None:
     app = QApplication.instance() or QApplication([])
     install_window_chrome(app)
 
-    assert bundled_resource_path("assets/bilibili.png").is_file()
+    assert bundled_resource_path("assets/bilibili-tray.png").is_file()
     assert not app.windowIcon().isNull()
 
 

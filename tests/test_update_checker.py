@@ -5,9 +5,10 @@ from bilibili_drops_miner.gui_parts.update_checker import (
 )
 
 
-def test_macos_port_uses_distinct_version_without_windows_release_updates() -> None:
-    assert APP_VERSION == "v2.1.0-macos.1"
+def test_unreleased_app_uses_initial_alpha_version() -> None:
+    assert APP_VERSION == "v0.1.0-alpha.1"
     assert UPDATE_CHANNEL == "dev"
+    assert not should_check_update(APP_VERSION, UPDATE_CHANNEL)
 
 
 def test_release_channel_checks_for_updates() -> None:
@@ -34,7 +35,7 @@ def test_v2_1_0_does_not_treat_v2_0_1_as_an_update() -> None:
             "tag_name": "v2.0.1",
             "html_url": "https://example.invalid/releases/v2.0.1",
         },
-        current_version=APP_VERSION,
+        current_version="v2.1.0",
         releases_url="https://example.invalid/releases",
     )
 

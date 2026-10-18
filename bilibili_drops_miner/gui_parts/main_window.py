@@ -138,8 +138,8 @@ class MinerGUI(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle(f"Bilibili 直播掉宝助手 {APP_VERSION}")
-        self.resize(1080, 820)
-        self.setMinimumSize(760, 640)
+        self.resize(1220, 800)
+        self.setMinimumSize(1060, 720)
 
         self.log_queue: "queue.Queue[str]" = queue.Queue()
         self._ui_alive = True
@@ -287,7 +287,6 @@ class MinerGUI(QMainWindow):
         self.start_btn = widgets.start_btn
         self.boost_concurrency_btn = widgets.boost_concurrency_btn
         self.apply_all_switch = widgets.apply_all_switch
-        self.auto_mining_description = widgets.auto_mining_description
         self.concurrency_mode_combo = widgets.concurrency_mode_combo
         self.minimize_to_tray_check = widgets.minimize_to_tray_check
         self.close_to_tray_check = widgets.close_to_tray_check
@@ -2266,7 +2265,7 @@ class MinerGUI(QMainWindow):
         scope_text = (
             "所有账号" if self.apply_all_switch.isChecked() else "当前账号"
         )
-        self.auto_mining_description.setText(
+        self.start_btn.setToolTip(
             (
                 f"作用范围：{scope_text}。后台任务检测已开启并会保持到程序退出；"
                 "全部领奖后自动关闭观看线程，发现新任务后再启动。"
@@ -2386,6 +2385,9 @@ class MinerGUI(QMainWindow):
         return self._task_progress_result or "点击“手动刷新”查看任务进度"
 
     def _show_task_message(self, text: str) -> None:
+        self.reward_stat.setText("—")
+        self.claimed_stat.setText("—")
+        self.task_table.clearSpans()
         self.task_table.setRowCount(1)
         item = QTableWidgetItem(text or "暂无任务数据")
         item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
@@ -2472,6 +2474,7 @@ class MinerGUI(QMainWindow):
         if snapshot.error:
             self._show_task_message(f"任务刷新失败：{snapshot.error}")
             self.discovery_status_label.setText("任务数据可能已失效，可重新识别当前任务")
+            self._set_discovery_status_style(True)
             if (
                 self._application_state == ApplicationState.RUNNING
                 and not self._rediscovery_attempted_for_run
@@ -2503,6 +2506,8 @@ class MinerGUI(QMainWindow):
             )
         self._set_discovery_status_style(False)
         self.task_table.setRowCount(len(progress_rows))
+        self.reward_stat.setText(str(len(progress_rows)))
+        self.claimed_stat.setText(str(sum(row.is_claimed for row in progress_rows)))
         for row, progress in enumerate(progress_rows):
             limit = float(progress.limit_value or 0)
             cur = float(progress.cur_value or 0)
@@ -2528,6 +2533,9 @@ class MinerGUI(QMainWindow):
             )
             for column, value in enumerate(values):
                 item = QTableWidgetItem(str(value))
+                item.setToolTip(str(value))
+                if column == 1:
+                    item.setData(Qt.UserRole, percent)
                 if column > 0:
                     item.setTextAlignment(Qt.AlignCenter)
                 self.task_table.setItem(row, column, item)
@@ -2591,7 +2599,19 @@ class MinerGUI(QMainWindow):
             detail += f" · {health.concurrency_detail}"
         if health.last_error:
             detail += f" · 最近错误：{health.last_error}"
-        self.runtime_detail_label.setText(detail)
+        self.runtime_detail_label.setToolTip(detail)
+        self.connection_stat.setToolTip(detail)
+        summary = [phase_label, heartbeat]
+        if health.reconnect_count:
+            summary.append(f"重连 {health.reconnect_count} 次")
+        if health.last_error:
+            summary.append(f"最近错误：{health.last_error}")
+        self.runtime_detail_label.setText(" · ".join(summary))
+        self.runtime_detail_label.setVisible(
+            health.state != ApplicationState.IDLE
+            or bool(health.last_error or health.reconnect_count)
+        )
+        self.connection_stat.setText(f"{health.active_sessions} / {health.target_sessions}")
 
     def _set_application_state(self, state: ApplicationState) -> None:
         self._application_state = state
@@ -2604,26 +2624,26 @@ class MinerGUI(QMainWindow):
                     state=state,
                 )
         labels = {
-            ApplicationState.IDLE: ("未运行", "#343a46"),
-            ApplicationState.DISCOVERING: ("识别中", "#1d4ed8"),
-            ApplicationState.STARTING: ("启动中", "#9a6700"),
-            ApplicationState.RUNNING: ("运行中", "#166534"),
-            ApplicationState.STOPPING: ("停止中", "#9a3412"),
-            ApplicationState.ERROR: ("异常", "#991b1b"),
+            ApplicationState.IDLE: ("未运行", "#f1f2f3", "#61666d"),
+            ApplicationState.DISCOVERING: ("识别中", "#e9f7fc", "#087ea4"),
+            ApplicationState.STARTING: ("启动中", "#e9f7fc", "#087ea4"),
+            ApplicationState.RUNNING: ("运行中", "#eaf5ec", "#397258"),
+            ApplicationState.STOPPING: ("停止中", "#e9f7fc", "#087ea4"),
+            ApplicationState.ERROR: ("异常", "#fff0eb", "#b13d2c"),
         }
         monitoring_without_watch_threads = (
             state == ApplicationState.IDLE
             and session is not None
             and session.session_id in self._automatic_mining_session_ids
         )
-        text, background = (
-            ("持续监测任务中", "#1d4ed8")
+        text, background, foreground = (
+            ("持续监测任务中", "#e9f7fc", "#087ea4")
             if monitoring_without_watch_threads
             else labels[state]
         )
         self.runtime_state_label.setText(text)
         self.runtime_state_label.setStyleSheet(
-            f"background:{background};color:#ffffff;border-radius:12px;"
+            f"background:{background};color:{foreground};border-radius:6px;"
             "padding:6px 12px;font-weight:600;"
         )
         busy = state in {
@@ -2691,8 +2711,12 @@ class MinerGUI(QMainWindow):
             )
 
     def _set_discovery_status_style(self, error: bool) -> None:
+        text = self.discovery_status_label.text()
+        self.discovery_status_label.setVisible(
+            error or (bool(text) and text != DEFAULT_DISCOVERY_HINT and not text.startswith("已加载当天任务"))
+        )
         self.discovery_status_label.setStyleSheet(
-            f"color:{'#fca5a5' if error else '#a7f3d0'};padding-left:92px;"
+            f"color:{'#b13d2c' if error else '#61666d'};font-size:13px;"
         )
 
     def _set_task_progress_text(self, text: str) -> None:
@@ -3221,13 +3245,16 @@ class MinerGUI(QMainWindow):
 
 
 def run_gui() -> int:
+    global _desktop_app, _desktop_window
     app = QApplication.instance() or QApplication(sys.argv)
+    _desktop_app = app
     configure_qt_app(app)
     install_window_chrome(app)
     instance_guard = SingleInstanceGuard()
     if not instance_guard.acquire():
         return 0
     window = MinerGUI()
+    _desktop_window = window
     instance_guard.activation_requested.connect(
         window.activate_existing_instance
     )

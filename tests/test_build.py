@@ -1,6 +1,16 @@
 import sys
+import os
 
 import build as build_module
+
+
+def test_windows_build_excludes_unrelated_dll_search_directories(monkeypatch) -> None:
+    monkeypatch.setattr(build_module.sys, "platform", "win32")
+    monkeypatch.setenv("PATH", r"C:\unrelated-toolchain\bin")
+    env = build_module.build_environment()
+    assert "unrelated-toolchain" not in env["PATH"]
+    assert str(build_module.Path(sys.base_prefix)) in env["PATH"].split(os.pathsep)
+    assert "System32" in env["PATH"]
 
 
 def test_macos_gui_build_uses_app_bundle_and_png_icon(monkeypatch) -> None:
@@ -18,5 +28,5 @@ def test_macos_gui_build_uses_app_bundle_and_png_icon(monkeypatch) -> None:
     assert kwargs["windowed"] is True
     assert kwargs["onefile"] is False
     extra = kwargs["extra_args"]
-    assert extra[extra.index("--icon") + 1] == "assets/bilibili.png"
+    assert extra[extra.index("--icon") + 1] == "assets/bilibili-tray.png"
     assert extra[extra.index("--osx-bundle-identifier") + 1] == "com.bilidrop.desktop"

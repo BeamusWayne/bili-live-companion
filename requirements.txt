@@ -7,3 +7,4 @@ selenium==4.46.0
 qrcode==8.2
 keyring==25.6.0
 cryptography==46.0.2
+tzdata==2026.5; sys_platform == "win32"

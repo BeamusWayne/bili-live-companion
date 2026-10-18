@@ -1,0 +1,292 @@
+from __future__ import annotations
+
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
+    QAbstractItemView, QButtonGroup, QComboBox, QFrame, QHBoxLayout, QHeaderView,
+    QLabel, QLineEdit, QProgressBar, QPushButton, QScrollArea, QSizePolicy,
+    QStackedWidget, QVBoxLayout, QWidget,
+)
+
+from bilibili_drops_miner._version import APP_VERSION
+from bilibili_drops_miner.gui_parts.workspace_components import RewardDelegate, RewardTable, line_icon
+from bilibili_drops_miner.gui_parts.window_chrome import bundled_resource_path
+
+
+def label(text, role="muted"):
+    widget = QLabel(text)
+    widget.setProperty("role", role)
+    return widget
+
+
+def build_workspace(window, callbacks):
+    # Import at call time because the common form helpers live in main_layout.
+    from bilibili_drops_miner.gui_parts.main_layout import _button, _card, _line_edit, ToggleSwitch
+
+    central = QWidget()
+    central.setObjectName("workspace")
+    window.setCentralWidget(central)
+    shell = QHBoxLayout(central)
+    shell.setContentsMargins(0, 0, 0, 0)
+    shell.setSpacing(0)
+
+    sidebar = QFrame()
+    sidebar.setObjectName("sidebar")
+    sidebar.setFixedWidth(188)
+    side = QVBoxLayout(sidebar)
+    side.setContentsMargins(16, 28, 16, 20)
+    side.setSpacing(7)
+    brand = QHBoxLayout()
+    mark = QLabel()
+    mark.setPixmap(QIcon(str(bundled_resource_path("assets/bilibili-tray.png"))).pixmap(36, 36))
+    mark.setAlignment(Qt.AlignCenter)
+    mark.setFixedSize(36, 36)
+    brand.addWidget(mark)
+    brand_words = QVBoxLayout()
+    brand_words.setSpacing(0)
+    name = label("Bili Companion", "brand")
+    name.setStyleSheet("font-size:14px;font-weight:700;")
+    brand_words.addWidget(name)
+    brand.addLayout(brand_words)
+    side.addLayout(brand)
+    side.addSpacing(30)
+
+    pages = QStackedWidget()
+    window.workspace_pages = pages
+    navigation = QButtonGroup(window)
+    navigation.setExclusive(True)
+    nav_buttons = []
+    for index, (text, icon_name) in enumerate((("直播工作台", "grid"), ("账号管理", "users"))):
+        button = QPushButton(text)
+        button.setObjectName("nav")
+        button.setIcon(line_icon(icon_name))
+        button.setCheckable(True)
+        button.setCursor(Qt.PointingHandCursor)
+        navigation.addButton(button, index)
+        button.clicked.connect(lambda checked=False, i=index: pages.setCurrentIndex(i))
+        side.addWidget(button)
+        nav_buttons.append(button)
+    nav_buttons[0].setChecked(True)
+    pages.currentChanged.connect(lambda i: nav_buttons[i].setChecked(True))
+    window.workspace_nav = nav_buttons
+    side.addSpacing(22)
+
+    def open_tab(index):
+        window.settings_tabs.setCurrentIndex(index)
+        callbacks.open_settings_log()
+
+    settings_button = QPushButton("设置与日志")
+    settings_button.setIcon(line_icon("settings"))
+    settings_button.setObjectName("nav")
+    settings_button.setCursor(Qt.PointingHandCursor)
+    settings_button.clicked.connect(lambda: open_tab(0))
+    side.addWidget(settings_button)
+    logs_button = QPushButton("运行日志")
+    logs_button.setIcon(line_icon("log"))
+    logs_button.setObjectName("nav")
+    logs_button.setCursor(Qt.PointingHandCursor)
+    logs_button.clicked.connect(lambda: open_tab(1))
+    side.addWidget(logs_button)
+    side.addStretch()
+    version = label(APP_VERSION)
+    version.setStyleSheet("font-size:12px;color:#61666d;padding-left:8px;")
+    side.addWidget(version)
+    shell.addWidget(sidebar)
+
+    content = QVBoxLayout()
+    content.setContentsMargins(30, 24, 30, 20)
+    content.setSpacing(16)
+    # A shared account selector keeps account context visible on both pages.
+    context = QHBoxLayout()
+    context.addWidget(label("当前账号"))
+    context.addStretch()
+    cookie_profile_combo = QComboBox()
+    cookie_profile_combo.setAccessibleName("账号档案与临时账号")
+    cookie_profile_combo.setMinimumWidth(260)
+    cookie_profile_combo.setMaximumWidth(520)
+    cookie_profile_combo.currentIndexChanged.connect(callbacks.select_cookie_profile)
+    context.addWidget(cookie_profile_combo)
+    login_button = _button("扫码登录", "purple", callbacks.auto_fetch_cookie)
+    login_button.setIcon(line_icon("qr", "#4c2031"))
+    login_button.setToolTip("添加或切换 Bilibili 账号")
+    context.addWidget(login_button)
+    content.addLayout(context)
+    content.addWidget(pages, 1)
+    shell.addLayout(content, 1)
+
+    def page():
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        body = QWidget()
+        scroll.setWidget(body)
+        layout = QVBoxLayout(body)
+        layout.setContentsMargins(0, 0, 2, 0)
+        layout.setSpacing(14)
+        pages.addWidget(scroll)
+        return layout
+
+    root = page()
+    heading = QHBoxLayout()
+    titles = QVBoxLayout()
+    titles.setSpacing(5)
+    titles.addWidget(label("直播工作台", "pageTitle"))
+    heading.addLayout(titles)
+    heading.addStretch()
+    runtime_state_label = QLabel("未运行")
+    runtime_state_label.setAlignment(Qt.AlignCenter)
+    runtime_state_label.setMinimumWidth(92)
+    runtime_state_label.setStyleSheet("background:#f1f2f3;color:#61666d;border-radius:6px;padding:6px 12px;")
+    heading.addWidget(runtime_state_label, 0, Qt.AlignTop)
+    root.addLayout(heading)
+
+    hero, hero_layout = _card("")
+    hero.setObjectName("hero")
+    hero_layout.setContentsMargins(22, 20, 22, 20)
+    hero_layout.setSpacing(14)
+    hero_heading = QHBoxLayout()
+    hero_title = label("直播间", "sectionTitle")
+    hero_title.setStyleSheet("font-size:15px;font-weight:600;")
+    hero_heading.addWidget(hero_title)
+    hero_heading.addStretch()
+    overwatch_esports_btn = _button("守望先锋电竞 ↗", "gray", callbacks.auto_fetch_overwatch_esports)
+    overwatch_esports_btn.setToolTip("设置房间 23612045 并立即识别")
+    hero_heading.addWidget(overwatch_esports_btn)
+    hero_layout.addLayout(hero_heading)
+    room_row = QHBoxLayout()
+    rooms_edit = _line_edit("直播间号或链接，多个用逗号分隔")
+    rooms_edit.setAccessibleName("直播间号")
+    room_row.addWidget(rooms_edit, 1)
+    discover_btn = _button("识别当前任务", "gray", callbacks.auto_fetch_task_ids)
+    room_row.addWidget(discover_btn)
+    browser_button = _button("浏览器获取", "gray", callbacks.auto_fetch_room_id)
+    browser_button.setIcon(line_icon("link"))
+    room_row.addWidget(browser_button)
+    hero_layout.addLayout(room_row)
+    discovery_status_label = label("填写房间号后识别任务；直播间未开播也可尝试识别。")
+    discovery_status_label.setWordWrap(True)
+    hero_layout.addWidget(discovery_status_label)
+
+    divider = QFrame()
+    divider.setFixedHeight(1)
+    divider.setStyleSheet("background:#e3e5e7;")
+    hero_layout.addWidget(divider)
+    stats = QHBoxLayout()
+    stats.setSpacing(30)
+    stat_labels = []
+    for title, value in (("活跃 / 目标连接", "0 / 0"), ("奖励节点", "—"), ("已领取", "—")):
+        group = QVBoxLayout()
+        group.setSpacing(3)
+        group.addWidget(label(title))
+        number = label(value, "statValue")
+        number.setStyleSheet("font-size:23px;font-weight:600;color:#18191c;")
+        group.addWidget(number)
+        stats.addLayout(group, 1)
+        stat_labels.append(number)
+    window.connection_stat, window.reward_stat, window.claimed_stat = stat_labels
+    hero_layout.addLayout(stats)
+    runtime_detail_label = label("连接 0/0 · 重连 0 · 等待启动")
+    runtime_detail_label.setWordWrap(True)
+    runtime_detail_label.setStyleSheet("color:#61666d;font-size:13px;")
+    hero_layout.addWidget(runtime_detail_label)
+    root.addWidget(hero)
+
+    controls = QHBoxLayout()
+    controls.setSpacing(10)
+    start_btn = _button("开始", "green", callbacks.toggle_run)
+    start_btn.setIcon(line_icon("play", "#4c2031"))
+    start_btn.setMinimumWidth(120)
+    boost_concurrency_btn = _button("加速执行（本次 100 线程）", "gray", callbacks.boost_concurrency)
+    boost_concurrency_btn.setIcon(line_icon("bolt"))
+    boost_concurrency_btn.setToolTip("仅本次强制 100 线程；持续模式可在高级设置修改")
+    controls.addWidget(start_btn)
+    controls.addWidget(boost_concurrency_btn)
+    controls.addStretch()
+    controls.addWidget(label("应用到所有账号"))
+    apply_all_switch = ToggleSwitch()
+    apply_all_switch.setAccessibleName("应用到所有账号")
+    apply_all_switch.setToolTip("将识别任务和开始/停止应用到所有账号，各账号进度独立")
+    controls.addWidget(apply_all_switch)
+    root.addLayout(controls)
+    progress_bar = QProgressBar()
+    progress_bar.setTextVisible(False)
+    progress_bar.setRange(0, 1)
+    progress_bar.hide()
+    root.addWidget(progress_bar)
+    watch_time_label = QLabel()
+    watch_time_label.hide()
+
+    task_card, task_layout = _card("")
+    task_layout.setContentsMargins(18, 14, 18, 8)
+    task_header = QHBoxLayout()
+    task_title = label("任务与奖励", "sectionTitle")
+    task_title.setStyleSheet("font-size:15px;font-weight:600;")
+    task_header.addWidget(task_title)
+    task_header.addStretch()
+    claim_rewards_btn = _button("手动领取", "gray", callbacks.claim_rewards)
+    claim_rewards_btn.setEnabled(False)
+    claim_rewards_btn.setToolTip("奖励会自动领取，失败时可在此重试")
+    task_header.addWidget(claim_rewards_btn)
+    refresh_button = _button("刷新", "gray", callbacks.refresh_tasks)
+    refresh_button.setIcon(line_icon("refresh"))
+    task_header.addWidget(refresh_button)
+    task_layout.addLayout(task_header)
+    task_table = RewardTable(0, 5)
+    task_table.setItemDelegate(RewardDelegate(task_table))
+    task_table.setHorizontalHeaderLabels(["任务 / 奖励节点", "完成进度", "状态", "奖励", "领取"])
+    task_table.setAccessibleName("任务进度列表")
+    task_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+    task_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+    task_table.setShowGrid(False)
+    task_table.setWordWrap(False)
+    task_table.verticalHeader().hide()
+    task_table.verticalHeader().setDefaultSectionSize(56)
+    task_table.horizontalHeader().setMinimumSectionSize(60)
+    task_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+    for column, width in ((1, 145), (2, 88), (3, 122), (4, 145)):
+        task_table.horizontalHeader().setSectionResizeMode(column, QHeaderView.Interactive)
+        task_table.setColumnWidth(column, width)
+    task_table.setMinimumHeight(270)
+    task_layout.addWidget(task_table, 1)
+    root.addWidget(task_card, 1)
+
+    accounts = page()
+    accounts.addWidget(label("账号管理", "pageTitle"))
+    account_card, account_layout = _card("")
+    cookie_remark_edit = _line_edit("账号备注，例如主号")
+    cookie_remark_edit.setAccessibleName("账号备注")
+    cookie_remark_edit.setMaximumWidth(520)
+    save_cookie_profile_btn = _button("保存档案", "blue", callbacks.save_cookie_profile)
+    delete_cookie_profile_btn = _button("删除", "gray", callbacks.delete_cookie_profile)
+    row = QHBoxLayout()
+    row.addWidget(cookie_remark_edit, 1)
+    row.addWidget(save_cookie_profile_btn)
+    row.addWidget(delete_cookie_profile_btn)
+    account_layout.addWidget(label("账号备注"))
+    account_layout.addLayout(row)
+    account_layout.addSpacing(10)
+    account_layout.addWidget(label("登录凭据"))
+    cookie_edit = _line_edit("SESSDATA、bili_jct 等登录 Cookie")
+    cookie_edit.setEchoMode(QLineEdit.Password)
+    cookie_edit.setAccessibleName("Bilibili Cookie")
+    cookie_reveal_btn = _button("显示", "gray", callbacks.toggle_cookie_visibility)
+    secret_row = QHBoxLayout()
+    secret_row.addWidget(cookie_edit, 1)
+    secret_row.addWidget(cookie_reveal_btn)
+    account_layout.addLayout(secret_row)
+    cookie_edit.setToolTip("凭据由操作系统加密保存；临时账号关闭后移除。推荐扫码登录。")
+    accounts.addWidget(account_card)
+    accounts.addStretch()
+
+    return dict(
+        cookie_edit=cookie_edit, rooms_edit=rooms_edit, cookie_profile_combo=cookie_profile_combo,
+        cookie_remark_edit=cookie_remark_edit, progress_bar=progress_bar, task_table=task_table,
+        settings_button=settings_button, claim_rewards_btn=claim_rewards_btn, start_btn=start_btn,
+        boost_concurrency_btn=boost_concurrency_btn, apply_all_switch=apply_all_switch,
+        discover_btn=discover_btn,
+        overwatch_esports_btn=overwatch_esports_btn, cookie_reveal_btn=cookie_reveal_btn,
+        save_cookie_profile_btn=save_cookie_profile_btn, delete_cookie_profile_btn=delete_cookie_profile_btn,
+        runtime_state_label=runtime_state_label, runtime_detail_label=runtime_detail_label,
+        discovery_status_label=discovery_status_label, watch_time_label=watch_time_label,
+    )
