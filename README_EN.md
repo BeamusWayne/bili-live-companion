@@ -18,7 +18,7 @@ QR sign-in · Multiple accounts · Task progress · Reward claims
 
 **v0.1.0** · [Download for Windows x64](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.0) · [Windows guide](docs/windows.md)
 
-[Features](#features) · [Quick Start](#quick-start) · [Support](#support-the-project) · [中文](README.md)
+[Features](#features) · [Desktop interface](#desktop-interface) · [Quick Start](#quick-start) · [Related projects](#related-projects) · [Support](#support-the-project) · [中文](README.md)
 
 </div>
 
@@ -111,6 +111,15 @@ docker compose logs -f --tail=100 bilidrop
 - Follow the platform's rules and keep concurrency modest. Task progress, watch time, and rewards are determined by the platform.
 - Windows credentials use DPAPI encryption. macOS credentials are protected by the system Keychain. Linux Cookie files are not encrypted; server root and Docker administrators can read them.
 - Real sign-in, watch-time credit, and reward claims depend on your account and current events. Check the UI or logs after deployment.
+
+## Related projects
+
+Two independent Bilibili tools by the same author, for different workflows:
+
+| Project | Use it for | Get started |
+| --- | --- | --- |
+| [BilibiliVideoDownloader](https://github.com/BeamusWayne/bilibili-video-downloader) | Batch video and audio downloads, verified resume and multiple output formats | [Windows x64](https://github.com/BeamusWayne/bilibili-video-downloader/releases/latest) |
+| [Bili Live Companion](https://github.com/BeamusWayne/bili-live-companion) | Live-drop watching, multi-account task tracking and reward claims | [Desktop and server guide](https://github.com/BeamusWayne/bili-live-companion/blob/main/README_EN.md#quick-start) |
 
 ## Support the project
 
