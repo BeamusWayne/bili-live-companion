@@ -18,7 +18,7 @@
 
 **v0.1.0** · [下载 Windows x64 版](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.0) · [Windows 使用说明](docs/windows.md)
 
-[功能一览](#功能一览) · [快速开始](#快速开始) · [支持项目](#支持项目) · [English](README_EN.md)
+[功能一览](#功能一览) · [桌面界面](#桌面界面) · [快速开始](#快速开始) · [相关项目](#相关项目) · [支持项目](#支持项目) · [English](README_EN.md)
 
 </div>
 
@@ -111,6 +111,15 @@ docker compose logs -f --tail=100 bilidrop
 - 请遵守平台规则，保持适度并发；任务、计时和奖励始终以平台实际结果为准。
 - Windows 凭据使用 DPAPI 加密，macOS 凭据受系统钥匙串保护；Linux 数据卷中的 Cookie 文件未加密，服务器 root 或 Docker 管理员可以读取。
 - 真实扫码、直播计时和领奖依赖账号及当前活动，需要部署后自行核对日志或界面。
+
+## 相关项目
+
+同一作者维护的两款独立工具，按使用场景选择：
+
+| 项目 | 适用场景 | 下载 |
+| --- | --- | --- |
+| [BilibiliVideoDownloader](https://github.com/BeamusWayne/bilibili-video-downloader) | 批量保存 B站视频与音频，支持校验续传和多格式导出 | [Windows x64](https://github.com/BeamusWayne/bilibili-video-downloader/releases/latest) |
+| [Bili Live Companion](https://github.com/BeamusWayne/bili-live-companion) | 直播掉宝任务守候、多账号进度追踪与奖励领取 | [桌面版与部署指南](https://github.com/BeamusWayne/bili-live-companion#快速开始) |
 
 ## 支持项目
 
