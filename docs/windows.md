@@ -80,3 +80,9 @@ $env:QT_QPA_PLATFORM = 'offscreen'
 `workspace-empty.png` 是初始界面，`workspace-preview.png` 含明确标记的演示数据；另外生成账号页和设置页截图。
 
 本次本地验证环境：Windows 11 x64、Python 3.12、PySide6 6.11。macOS/Linux 的底层业务代码保留，其他平台的打包需在对应系统上验证。
+
+## 联动测试版
+
+v0.1.1-beta.1 提供「下载回放 / 视频」入口、公开视频链接确认和平台进度确认提示。测试版独立 EXE 不替换 v0.1.0 稳定版发布；仍使用同一用户数据目录。
+
+本轮在 Windows 上通过 189 项桌面范围测试（按构建脚本排除 Linux 专用 server 测试），并完成独立 EXE 的离线 DPAPI、资源和窗口导航冒烟检查。未据此声称真实活动掉宝和领奖已完成在线验证。

@@ -144,7 +144,7 @@ class AccountTaskMonitor:
                     self._claim_succeeded(attempt.result)
                     for attempt in claim_results
                 ):
-                    self._emit(TaskSnapshot(progresses=tuple(progresses)))
+                    self._emit(TaskSnapshot(progresses=tuple(progresses), server_confirmed=False))
                 try:
                     await self._notify_new_completions(
                         progresses,
@@ -199,7 +199,7 @@ class AccountTaskMonitor:
                         self._record_claim_failure(unit.marker_id)
                 if units:
                     self._emit(
-                        TaskSnapshot(progresses=tuple(self._latest_progresses))
+                        TaskSnapshot(progresses=tuple(self._latest_progresses), server_confirmed=False)
                     )
                     self._notify_rewards_settled(self._latest_progresses)
                 return results

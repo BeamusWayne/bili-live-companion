@@ -82,6 +82,7 @@ class TaskSnapshot:
     progresses: tuple[TaskProgress, ...] = field(default_factory=tuple)
     refreshed_at: float = field(default_factory=time)
     error: str = ""
+    server_confirmed: bool = True
 
     @property
     def completed_count(self) -> int:

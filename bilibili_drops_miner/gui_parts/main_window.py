@@ -2403,6 +2403,7 @@ class MinerGUI(QMainWindow):
         session = self._account_sessions.get(session_id)
         if session is None:
             return
+        session.progress_confirmation.observe(snapshot, running=session.application_state == ApplicationState.RUNNING)
         session.latest_task_snapshot = snapshot
         session.task_progress_pending = False
         if session_id == self._active_session_id:
@@ -2465,6 +2466,7 @@ class MinerGUI(QMainWindow):
 
 
     def _apply_task_snapshot(self, snapshot: TaskSnapshot) -> None:
+        self._active_session.progress_confirmation.observe(snapshot, running=self._application_state == ApplicationState.RUNNING)
         self._active_session.latest_task_snapshot = snapshot
         self._render_task_snapshot(snapshot)
 
@@ -2580,7 +2582,7 @@ class MinerGUI(QMainWindow):
         heartbeat = "等待首次心跳"
         if health.last_heartbeat_at:
             age = max(0, int(time() - health.last_heartbeat_at))
-            heartbeat = f"最近心跳 {age} 秒前"
+            heartbeat = f"连接心跳 {age} 秒前"
         mode = health.concurrency_mode or self._active_session.concurrency_mode
         phase = health.concurrency_phase
         if mode == "automatic":
@@ -2601,7 +2603,10 @@ class MinerGUI(QMainWindow):
             detail += f" · 最近错误：{health.last_error}"
         self.runtime_detail_label.setToolTip(detail)
         self.connection_stat.setToolTip(detail)
-        summary = [phase_label, heartbeat]
+        confirmation = self._active_session.progress_confirmation.label(now=time(), interval=self._active_session.task_query_interval_seconds)
+        summary = [phase_label, heartbeat, confirmation]
+        if self._active_session.task_ends_at:
+            summary.append(f"活动截止 {self._active_session.task_ends_at:%m-%d %H:%M}")
         if health.reconnect_count:
             summary.append(f"重连 {health.reconnect_count} 次")
         if health.last_error:
