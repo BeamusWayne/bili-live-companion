@@ -42,7 +42,7 @@
 
 运行状态区区分连接心跳、平台最近同步和已确认的进度增长。连续三次成功同步没有增长时明确提示；活动截止时间可用时显示，超过同步时限则标明数据过期。未增长提示表示需要检查平台任务状态，不等于断言掉宝活动失效。
 
-当前测试版安装包见 [Releases](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.1-beta.1)。下载器协议与边界见 [联动说明](https://github.com/BeamusWayne/bilibili-video-downloader/blob/feat/white-ui-companion/docs/companion.md)。
+当前测试版安装包见 [Releases](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.1-beta.1)。下载器协议与边界见 [联动说明](https://github.com/BeamusWayne/bilibili-video-downloader/blob/v0.2.0-beta.2/docs/companion.md)。
 
 ## 三种运行方式
 
