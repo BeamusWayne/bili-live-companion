@@ -7,6 +7,7 @@ from enum import Enum
 from typing import Any
 
 from bilibili_drops_miner.config import DEFAULT_SESSIONS_PER_ROOM
+from bilibili_drops_miner.progress_confirmation import ProgressConfirmation
 from bilibili_drops_miner.domain import ApplicationState, RuntimeHealth, TaskSnapshot
 from bilibili_drops_miner.gui_parts.cookie_profiles import extract_cookie_uid
 from bilibili_drops_miner.gui_parts.worker_controller import WorkerController
@@ -49,6 +50,7 @@ LOGIN_STATE_LABELS = {
 
 @dataclass(slots=True)
 class AccountWorkspace:
+    progress_confirmation: ProgressConfirmation = field(default_factory=ProgressConfirmation, init=False)
     session_id: str
     cookie: str = ""
     remark: str = ""

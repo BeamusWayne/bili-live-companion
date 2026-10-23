@@ -1,5 +1,5 @@
-APP_VERSION = "v0.1.0"
-UPDATE_CHANNEL = "release"
+APP_VERSION = "v0.1.1-beta.1"
+UPDATE_CHANNEL = "beta"
 REPOSITORY_URL = "https://github.com/BeamusWayne/bili-live-companion"
 LATEST_RELEASE_API = "https://api.github.com/repos/BeamusWayne/bili-live-companion/releases/latest"
 RELEASES_URL = "https://github.com/BeamusWayne/bili-live-companion/releases/latest"

@@ -36,6 +36,14 @@
 
 任务与奖励结果以 Bilibili 实际接口为准。页面结构变化可能影响自动识别；此时仍可观看，并可在 Linux 配置中手动填写任务 ID。
 
+## 与下载器联动（v0.1.1-beta.1）
+
+侧栏新增「下载回放 / 视频」。粘贴已发布回放或相关视频的 BV/AV 链接，在 [BilibiliVideoDownloader](https://github.com/BeamusWayne/bilibili-video-downloader) 中确认格式、目录和分 P 后保存。两款应用独立保存凭据，仅传递公开链接；直播间不是回放地址。未安装下载器时可获取安装包或复制链接。
+
+运行状态区区分连接心跳、平台最近同步和已确认的进度增长。连续三次成功同步没有增长时明确提示；活动截止时间可用时显示，超过同步时限则标明数据过期。未增长提示表示需要检查平台任务状态，不等于断言掉宝活动失效。
+
+当前测试版安装包见 [Releases](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.1-beta.1)。下载器协议与边界见 [联动说明](https://github.com/BeamusWayne/bilibili-video-downloader/blob/v0.2.0-beta.2/docs/companion.md)。
+
 ## 三种运行方式
 
 | | Windows 桌面版 | macOS 桌面版 | Linux 云服务器版 |

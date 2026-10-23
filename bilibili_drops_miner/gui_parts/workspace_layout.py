@@ -87,6 +87,12 @@ def build_workspace(window, callbacks):
     logs_button.setCursor(Qt.PointingHandCursor)
     logs_button.clicked.connect(lambda: open_tab(1))
     side.addWidget(logs_button)
+    from bilibili_drops_miner.downloader_bridge import open_download_dialog
+    download_button = QPushButton("下载回放 / 视频")
+    download_button.setObjectName("nav")
+    download_button.setIcon(line_icon("link"))
+    download_button.clicked.connect(lambda: open_download_dialog(window))
+    side.addWidget(download_button)
     side.addStretch()
     version = label(APP_VERSION)
     version.setStyleSheet("font-size:12px;color:#61666d;padding-left:8px;")

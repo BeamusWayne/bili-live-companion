@@ -36,6 +36,14 @@ QR sign-in · Multiple accounts · Task progress · Reward claims
 
 Task and reward results depend on Bilibili's responses. Changes to the live-room page may affect automatic discovery; watching can continue, and Linux users can provide task IDs manually.
 
+## Downloader handoff (v0.1.1-beta.1)
+
+Choose **下载回放 / 视频** in the sidebar and supply published BV/AV replay or related-video links. [BilibiliVideoDownloader](https://github.com/BeamusWayne/bilibili-video-downloader) opens a confirmation preview before downloading. Credentials stay separate. Live rooms are never treated as replay URLs; a missing downloader has download/copy-link fallbacks.
+
+Runtime status distinguishes transport heartbeats, platform synchronization and confirmed progress growth. Three unchanged successful polls produce a visible hint, stale data is marked, and available activity deadlines are shown. This does not assert that an event is invalid.
+
+The test build is available under [Releases](https://github.com/BeamusWayne/bili-live-companion/releases/tag/v0.1.1-beta.1).
+
 ## Choose your setup
 
 | | Windows desktop | macOS desktop | Linux cloud server |
